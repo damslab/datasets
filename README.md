@@ -1,3 +1,3 @@
-# TU Graz ISDS Datasets
+# TU Berlin DAMS Lab Datasets
 
-This repository contains miscellaneous datasets curated by Graz University of Technology, Institute of Interactive Systems and Data Science (ISDS), primarily in support of teaching and research.
+This repository contains miscellaneous datasets curated by Technische Universität Berlin, FG Big Data Engineering (DAMS Lab), primarily in support of teaching and research.
