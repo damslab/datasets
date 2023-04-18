@@ -183,6 +183,6 @@ A example of a combined image marking stars and galaxies. (red galaxies, orange 
 
 ![301/3918/3/003918-3-0213.jpg](./frame-irg-003918-3-0213-marked.jpg)
 
-A example of a Machine learning target to predict (blue is nothing, green stars, red galaxies, yellow overlapping),
+An example of a machine learning target to predict (blue is nothing, green is stars, red is galaxies and yellow is overlapping),
 
 ![301/3918/3/003918-3-0213.jpg](./frame-003918-3-0213-target.jpg)
