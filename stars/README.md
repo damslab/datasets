@@ -1,10 +1,12 @@
 # Stars
 
-This dataset is a collection of spectral band inputs of the Sloan Digital Sky Survey SDSS. It contains extracted patches images of the sky that can be used to classify if a specific coordinate is a star or a galaxy.
+This dataset is a collection of spectral band inputs of the Sloan Digital Sky Survey (SDSS).
+It contains patches of the sky that can be used to classify if a specific coordinate is a star or a galaxy.
 
 ## The data
 
-To get started we have to be a bit familiar with the SDSS file formats. FITS stands for Flexible Image Transport system and is a astronomy community format endorsed by NASA.
+To get started we have to be a bit familiar with the SDSS file formats.
+FITS stands for Flexible Image Transport System and is a astronomy community format endorsed by NASA.
 
 To download a single band (in this case the R band) of a single patch of the sky run the following instruction:
 
@@ -13,8 +15,6 @@ wget https://data.sdss.org/sas/dr17/eboss/photoObj/frames/301/3918/3/frame-r-003
 ```
 
 There are 4 more spectral bands for this image, each can be found by replacing 'r' with 'g' 'i' 'u' 'z'. To read briefly more about these bands go to: <https://skyserver.sdss.org/dr1/en/proj/advanced/color/sdssfilters.asp>. Notably only 2 of the bands are in human visual range, and more interestingly when plotting astronomical images the traditional 'RGB' is replaced with 'IRG'. An example of such is the below ---also provided by SDSS--- reconstructed image.
-
-The image:
 
 ![301/3918/3/003918-3-0213.jpg](./frame-irg-003918-3-0213.jpg)
 
@@ -29,22 +29,24 @@ wget https://data.sdss.org/sas/dr17/eboss/photoObj/frames/301/2505/3/frame-u-003
 wget https://data.sdss.org/sas/dr17/eboss/photoObj/frames/301/2505/3/frame-z-003918-3-0213.fits.bz2
 ```
 
-Download provided jpg of only 3 spectral bands (and compressed)
+Download provided jpg of only 3 spectral bands
 
 ``` bash
 wget https://data.sdss.org/sas/dr17/eboss/photoObj/frames/301/3918/3/frame-irg-003918-3-0213.jpg
 ```
 
-## Combining Spectral bands
+## Combining Spectral Bands
 
-The different spectral bands are not aligned perfectly. To understand this, consider each band as a different picture taken in rapid succession, and since nothing is stationary in the universe the earth is rotating around itself and the sun, and everything else is moving as well.
+The different spectral bands are not aligned perfectly.
+To understand this, consider each band as a different picture taken in rapid succession pointing slightly differently at the sky.
+This happens because nothing is stationary in the universe, e.g. earth is rotating around itself and the sun, and everything else is moving as well.
 
 In practice this means that there are some minor differences at where each spectral band is pointing.
 To figure out where, each fits file contain the following information:
 
 <https://data.sdss.org/datamodel/files/BOSS_PHOTOOBJ/frames/RERUN/RUN/CAMCOL/frame.html>
 
-For the purpose of training a classifier only HDU0 is required (but if you want you might extract some extra information).
+For the purpose of training a classifier only HDU0 is required, but you could extract extra information.
 
 HDU0 contains some information specificity about the orientation of the image.
 
@@ -61,7 +63,7 @@ CD2_2   float   Dec deg per row pixel
 
 To align the images one can use these to calculate the offset for pixels to align with the other spectral bands. At the time of writing i use the r band as reference and align the other bands on top of it.
 
-If one want to avoid the math exercise associated with aligning the images, one framework in python that can be used is <https://www.astropy.org/>.
+If one want to avoid the math exercise associated with aligning the images, <https://www.astropy.org/> in python can be used.
 
 More specifically i suggest using the sub packages:
 
@@ -92,11 +94,15 @@ wget https://data.sdss.org/sas/dr17/eboss/sweeps/dr13_final/301/calibObj-003918-
 wget https://data.sdss.org/sas/dr17/eboss/sweeps/dr13_final/301/calibObj-003918-3-sky.fits.gz
 ```
 
-See <https://data.sdss.org/datamodel/files/PHOTO_SWEEP/RERUN/calibObj.html> for a detailed description of content.
+See <https://data.sdss.org/datamodel/files/PHOTO_SWEEP/RERUN/calibObj.html> for a detailed description of the content.
 
-Note that the data model is different for each of the files, in specific you need to extract the RA and Dec of each star and these fields are at different indexes for each file type.
+Note that the data model is different for each of the files, in specific you need to extract the RA and Dec of each object and these fields are at different indexes for each file type.
+
+For a prediction task we suggest using gal and star only.
 
 ## Bulk download commands
+
+To download multiple images we suggest filling up a spec file that downloads each band and file specified.
 
 ``` bash
 # Stars and Galaxies
@@ -112,21 +118,26 @@ echo frame-z-008162-6-0080.fits.bz2 >> spec-list.txt
 echo frame-irg-008162-6-0080.jpg    >> spec-list.txt
 
 # All images for these stars
-wget -i spec-list.txt -r --no-parent -nd -B 'https://data.sdss.org/sas/dr17/eboss/photoObj/frames/301/8162/6/'
+wget --spider -i spec-list.txt -r --no-parent -nd -B 'https://data.sdss.org/sas/dr17/eboss/photoObj/frames/301/8162/6/'
 ```
 
 Note Spider specify test download to not download. Remove that part if you actually have room and want to download it.
 
-To see thumbnails of images here is a handy homepage:
+Note each band is in the range of 3 to 4 MB compressed, and 12.4 MB uncompressed, giving in total 62 MB data for each frame downloaded.
+Furthermore the star and gals each in this example fill 30.6 MB and 33.7 MB uncompressed, but they contain the stars and galaxies for all images in ```frame-*-008162-6-*.fits.bz2```.
+
+To see thumbnails of all images in ```frame-*-008162-6-*.fits.bz2``` here is a handy homepage:
 
 <https://data.sdss.org/sas/dr17/eboss/photoObj/frames/301/8162/frames-run-008162.html>
 
-Note we downloaded CamCol 6 image 80.
+**Note we downloaded Rerun 301 Run 8162 CamCol 6 Image 80.**
 
 ## **### IMPORTANT ###**
 
 Do not overload the servers that provide the images. Since it is free and the servers providing them are ... getting older.
 If you can download only once and share the images internally please do.
+
+Once you have preprocessing pipelines reduce the size of the images.
 
 If your download aborted try using 'rsync' to only download the images that you are missing, here is a guide:
 
@@ -134,17 +145,18 @@ If your download aborted try using 'rsync' to only download the images that you 
 
 ## Example provided
 
-csv files with image coordinates for stars and galaxies:
+Here is a description of a possible preprocessing output of the original files.
 
 - [003918-3-0213_gals.csv](./003918-3-0213_gals.csv)
 - [003918-3-0213_stars.csv](./003918-3-0213_stars.csv)
-- [frame-irg-003918-3-0213-marked.jpg](./frame-irg-003918-3-0213-marked.jpg)
-- [frame-003918-3-0213-target.jpg](./frame-003918-3-0213-target.jpg)
+
+Csv files containing the pixel coordinates of the stars and galaxies.
+
 - [003918-3-0213_img.pkl.bz2](./003918-3-0213_img.pkl.bz2)
 
 The file 003918-3-0213_img.pkl.bz2 contains a the combined 5 channel image of the example, extracted and aligned.
 
-once decompressed it can be loaded and plotted like like so:
+Once decompressed it can be loaded and plotted like so:
 
 ```python
 import matplotlib.pyplot as plt
@@ -163,6 +175,9 @@ plt.subplots_adjust(left=0.0, right=1.0, top=1.0, bottom=0.0, wspace=0.0, hspace
 plt.imshow(img)
 plt.savefig("003918-3-0213_img.pdf")
 ```
+
+- [frame-irg-003918-3-0213-marked.jpg](./frame-irg-003918-3-0213-marked.jpg)
+- [frame-003918-3-0213-target.jpg](./frame-003918-3-0213-target.jpg)
 
 A example of a combined image marking stars and galaxies. (red galaxies, orange stars)
 
